@@ -1,0 +1,28 @@
+local replicatedStorage = game:GetService("ReplicatedStorage")
+
+local throwEvent = replicatedStorage:FindFirstChild("ThrowEvent")
+
+throwEvent.OnServerEvent:Connect(function(player, targetPosition)
+    local character = player.Character
+    if not character then return end
+    
+    local tool = character:FindFirstChildOfClass("Tool")
+    if not tool then return end
+    
+    local handle = tool:FindFirstChild("Handle")
+    if not handle then return end
+
+    -- Detach the tool from the player
+    tool.Parent = game.Workspace
+    
+    -- Enable physics
+    local bodyVelocity = Instance.new("BodyVelocity")
+    bodyVelocity.Velocity = (targetPosition - handle.Position).unit * 50 -- Adjust speed
+    bodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000) -- Allow movement
+    bodyVelocity.Parent = handle
+
+    -- Remove force after a short delay
+    game:GetService("Debris"):AddItem(bodyVelocity, 0.5)
+
+    print(player.Name .. " threw the tool!")
+end)
